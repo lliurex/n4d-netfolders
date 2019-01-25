@@ -1,0 +1,15 @@
+folder={
+	"teachers":
+	{
+		"path":"/net/server-sync/home/teachers/",
+		"perm":770,
+		"acl":
+		[
+			("-d -m","u:adm:rwx"),
+			("-m","g:teachers:---")
+		]
+	
+	
+	}
+
+}

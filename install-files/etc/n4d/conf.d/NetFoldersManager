@@ -1,0 +1,16 @@
+[SETUP]
+type=python
+path=NetFoldersManager.py
+class=NetFoldersManager
+[METHODS]
+check_local_folders=adm,admins
+set_acl=adm,admins
+get_shared_folders=anonymous
+mount_gluster_volumes=adm,admins
+get_acl_group_filtered=anonymous
+restore_acls=adm,admins
+backup=adm,admins
+restore=adm,admins
+restore_acls_via_thread=adm,admins
+is_acl_thread_alive=adm,admins
+restore_teacher_access=adm,admins,teachers
