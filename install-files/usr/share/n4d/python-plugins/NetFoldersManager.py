@@ -454,7 +454,7 @@ class NetFoldersManager:
 
 			for folder in folders:
 
-				os.system("chown %s:nogroup '%s'"%(student,folder%student))
+				os.system("chown '%s':nogroup '%s'"%(student,folder%student))
 				os.system("chmod 770 -R '%s'"%(folder%student))
 
 			return True
