@@ -1,0 +1,16 @@
+Source: n4d-netfolders
+Section: admin
+Priority: extra
+Maintainer: Hector Garcia Huerta <lliurex_devel1@edu.gva.es>
+Build-Depends: debhelper (>= 8.0.0), n4d-dev
+Standards-Version: 3.9.7
+Homepage: http://www.lliurex.net
+#Vcs-Svn: http://svn.lliurex.net/pandora/n4d-clientvars/trunk
+
+Package: n4d-netfolders
+Architecture: all
+Pre-depends: n4d
+Depends: ${shlibs:Depends}, ${misc:Depends}, acl
+Description: N4D plugin to configure network folders
+ This plugin configures samba network folders
+ 
