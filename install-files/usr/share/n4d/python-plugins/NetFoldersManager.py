@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import os.path
 import shutil
@@ -9,10 +10,14 @@ import grp
 import pwd
 import imp
 import threading
+import n4d.responses
 sambaparser=imp.load_source("SambaParser","/usr/share/n4d/python-plugins/support/sambaparser.py")
 
 
 class NetFoldersManager:
+
+	#ERRORS CODE
+	# restore_acls=-10
 	
 	
 	LOCAL_CONF_FOLDER="/var/lib/lliurex-folders/local/"
@@ -46,7 +51,8 @@ class NetFoldersManager:
 		file_path=backup_dest+get_backup_name("NetFoldersManager")
 		if backup_target is None:
 			backup_target = [os.path.join(self.BASE_DIR,x) for x in os.listdir(self.BASE_DIR)]
-		return objects['FileUtils'].backup(backup_target,file_path)
+		#Old n4d: return objects['FileUtils'].backup(backup_target,file_path)
+		n4d.responses.build_successful_call_response(objects['FileUtils'].backup(backup_target,file_path))
 
 	#def backup
 
@@ -56,7 +62,8 @@ class NetFoldersManager:
 				if "NetFoldersManager" in f:
 					backup_file="/backup/"+f
 					break
-		return objects['FileUtils'].restore(backup_file,'/')
+		#Old n4d: return objects['FileUtils'].restore(backup_file,'/')
+		n4d.responses.build_successful_call_response(objects['FileUtils'].restore(backup_file,'/'))
 
 	#def restore
 
@@ -64,7 +71,8 @@ class NetFoldersManager:
 		try:
 			list_mount = []
 			if not os.path.exists('/var/lib/n4d-glusterfs/volumes'):
-				return True
+				#Old n4d: return True
+				n4d.responses.build_successful_call_response(True)
 			f = open('/var/lib/n4d-glusterfs/volumes')
 			lines = f.readlines()
 			to_mount = [ x[:x.find('#') - 1] for x in lines ]
@@ -85,9 +93,10 @@ class NetFoldersManager:
 						if item.find(item2)!=-1:
 							os.system("mount -t glusterfs -o acl " + item )
 							continue
-		except Exception, e:
+		except Exception as e:
 			pass
-		return True
+		#Old n4d: return True
+		n4d.responses.build_successful_call_response(True)
 
 	#def mount_gluster_volumes
 
@@ -136,7 +145,8 @@ class NetFoldersManager:
 					
 
 
-		return info
+		#Old n4d: return info
+		n4d.responses.build_successful_call_response(info)
 		
 	#def get_acl_info
 	
@@ -165,15 +175,17 @@ class NetFoldersManager:
 							ret_[info["path"]]["perm"]=orig_info[item]["perm"]
 							ret_[info["path"]]["acl"]=ret
 								
-							return(ret_)
+							#Old n4d: return(ret_)
+							n4d.responses.build_successful_call_response(ret_)
 			
 			
 				
 			except Exception as e:
-				print e
+				print (e)
 			
 			
-		return None
+		#Old n4d: return None
+		n4d.responses.build_successful_call_response(None)
 			
 		
 	#def get_diferences
@@ -238,8 +250,8 @@ class NetFoldersManager:
 
 
 			try:					
-				info=self.get_acl_info(path)
-				info=self.get_missing_acl_conf(info)
+				info=self.get_acl_info(path)['return']
+				info=self.get_missing_acl_conf(info)['return']
 				
 				if ( os.lstat(path).st_uid != user ) or (os.lstat(path).st_gid != group):
 					os.lchown(path,user,group)
@@ -254,7 +266,7 @@ class NetFoldersManager:
 					options,value=acl
 					self.set_acl(path,options,value,recursive)
 			except Exception as e:
-				print e
+				print (e)
 
 	#def check_local_folders
 	
@@ -302,7 +314,9 @@ class NetFoldersManager:
 							#print e
 							pass
 						
-		return self.remote_dirs
+		#Old n4d: return self.remote_dirs
+		n4d.responses.build_successful_call_response(self.remote_dirs)
+
 		
 	#def check_shared_folders
 	
@@ -331,7 +345,8 @@ class NetFoldersManager:
 						x[0] = u'-m'
 						result.append(x)
 			aux_file.close()
-		return result
+		#Old n4d: return result
+		return n4d.responses.build_successful_call_response(result)
 		
 		
 	def is_dir_workable(self,current_dir,banned_list):
@@ -340,10 +355,12 @@ class NetFoldersManager:
 			
 			if dir in current_dir:
 				
-				return False
+				#Old n4d: return False
+				return n4d.responses.build_successful_call_response(False)
 				
 				
-		return True
+		#Old n4d: return True
+		return n4d.responses.build_successful_call_response(True)
 		
 	#def is_dir_workable
 
@@ -389,7 +406,7 @@ class NetFoldersManager:
 					for walk_item in os.walk(path):
 						dir,subdirs,files=walk_item
 						
-						if self.is_dir_workable(dir,dirs_to_process):
+						if self.is_dir_workable(dir,dirs_to_process)['status'] == 0:
 							#print dir
 							#print "\t",files
 							dir=dir.encode("utf-8")	
@@ -415,12 +432,14 @@ class NetFoldersManager:
 							os.umask(prevmask)
 							
 							
-			return [True,""]
+			#return [True,""]
+			return n4d.responses.build_successful_call_response(True)
 			
 			
 		except Exception as e:
 			
-			return [False,str(e)]
+			#return [False,str(e)]
+			return n4d.responses.build_failed_call_response(-10,str(e))
 		
 		
 	#def restore_acls
@@ -450,17 +469,19 @@ class NetFoldersManager:
 		folders=["/net/server-sync/home/students/%s/Desktop","/net/server-sync/home/students/%s/Documents"]
 		if pwd.getpwnam(student).pw_uid > 20000:
 
-			print "Fixing %s ..."%student
+			print ("Fixing %s ..."%student)
 
 			for folder in folders:
 
 				os.system("chown '%s':nogroup '%s'"%(student,folder%student))
 				os.system("chmod 770 -R '%s'"%(folder%student))
 
-			return True
+			#Old n4d: return True
+			return n4d.responses.build_successful_call_response(True)
 
 		else:
-			return False
+			#Old n4d: return False
+			return n4d.responses.build_successful_call_response(False)
 
 
 	#def restore_teacher_access
