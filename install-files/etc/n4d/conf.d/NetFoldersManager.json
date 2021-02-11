@@ -1,0 +1,105 @@
+{
+    "SETUP": {
+        "type": "python",
+        "path": "NetFoldersManager.py",
+        "class": "NetFoldersManager"
+    },
+    "METHODS": {
+        "backup": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "restore": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "mount_gluster_volumes": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "get_acl_info": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "get_missing_acl_conf": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "parse_local_folders_conf": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "check_local_folders": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "set_acl": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "get_shared_folders": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "dprint": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "get_acl_group_filtered": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "is_dir_workable": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "restore_acls": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "restore_acls_via_thread": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "is_acl_thread_alive": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        },
+        "restore_teacher_access": {
+            "allowed_groups": [
+                "sudo",
+                "admins"
+            ]
+        }
+    }
+}
