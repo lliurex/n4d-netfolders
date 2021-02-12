@@ -21,11 +21,11 @@ class SambaParser:
 	def parse_lines(self,lines,path,section=None):
 		
 		count=1
-		if not self.conf.has_key(section):
+		if section not in self.conf:
 			self.conf[section]={}
 		
 		for line in lines:
-
+		
 			for strip_value in self.strip_values:
 				line=line.lstrip(strip_value)
 			
@@ -33,7 +33,6 @@ class SambaParser:
 				
 				for strip_value in self.strip_values:
 					line=line.rstrip(strip_value)
-					
 					
 				tmp=line.split("=")
 				
@@ -45,7 +44,7 @@ class SambaParser:
 						value="=".join(tmp[1:])
 					else:
 						return(False,"Malformed option in line " + str(count) + ":\n" + line)
-				
+
 				for strip_value in self.strip_values:
 					key=key.rstrip(strip_value)
 					
@@ -63,6 +62,7 @@ class SambaParser:
 					self.conf[section][key]['path'] = path
 					
 				'''
+
 				self.conf[section][key]=value
 				
 				
@@ -81,7 +81,6 @@ class SambaParser:
 					#print line.find("]"),len(line)
 					return (False,"Malformed section in line " + str(count) + ":\n" + line)
 					
-				
 		
 		return True
 			
