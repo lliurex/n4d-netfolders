@@ -11,6 +11,7 @@ import pwd
 import imp
 import threading
 import n4d.responses
+import n4d.server.core
 sambaparser=imp.load_source("SambaParser","/usr/share/n4d/python-plugins/support/sambaparser.py")
 
 
@@ -26,7 +27,9 @@ class NetFoldersManager:
 	
 	def __init__(self):
 			
-		self.debug=False	
+		self.debug=False
+		
+		self.core=n4d.server.core.Core.get_core()
 		
 		self.acl_thread=threading.Thread()
 		
@@ -94,9 +97,10 @@ class NetFoldersManager:
 							os.system("mount -t glusterfs -o acl " + item )
 							continue
 		except Exception as e:
-			pass
+			print(e)
+			
 		#Old n4d: return True
-		n4d.responses.build_successful_call_response(True)
+		return n4d.responses.build_successful_call_response(True)
 
 	#def mount_gluster_volumes
 
@@ -108,9 +112,11 @@ class NetFoldersManager:
 		os.environ["LANG"]="C"
 		p=subprocess.Popen(["getfacl","-n",path],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 		out=p.communicate()[0]
+		out=out.decode("utf-8")
 		
 		info["acl"]=[]
-		info["perm"]=int(str(oct(stat.S_IMODE(os.lstat(path).st_mode))).lstrip("0"))
+		tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0")
+		info["perm"]=tmp
 		info["path"]=path
 		
 		for item in out.split("\n"):
@@ -144,9 +150,8 @@ class NetFoldersManager:
 				info["acl"].append([mode,type_+custom_group+":"+acl])
 					
 
-
 		#Old n4d: return info
-		n4d.responses.build_successful_call_response(info)
+		return n4d.responses.build_successful_call_response(info)
 		
 	#def get_acl_info
 	
@@ -160,9 +165,11 @@ class NetFoldersManager:
 				txt="".join(ff.readlines())
 				ff.close()
 				orig_info=eval(txt)
+
 				for item in orig_info:
 					found=False
 					if orig_info[item]["path"]==info["path"]:
+
 						for acl in orig_info[item]["acl"]:
 							if not acl in info["acl"]:
 								ret.append(acl)
@@ -176,8 +183,7 @@ class NetFoldersManager:
 							ret_[info["path"]]["acl"]=ret
 								
 							#Old n4d: return(ret_)
-							n4d.responses.build_successful_call_response(ret_)
-			
+							return n4d.responses.build_successful_call_response(ret_)
 			
 				
 			except Exception as e:
@@ -185,7 +191,7 @@ class NetFoldersManager:
 			
 			
 		#Old n4d: return None
-		n4d.responses.build_successful_call_response(None)
+		return n4d.responses.build_successful_call_response(None)
 			
 		
 	#def get_diferences
@@ -200,7 +206,8 @@ class NetFoldersManager:
 				f_=open(self.LOCAL_CONF_FOLDER+f,"r")
 				data=json.load(f_)
 				f_.close()				
-				self.local_dirs=dict(self.local_dirs.items()+data.items())
+				#self.local_dirs=dict(self.local_dirs.items()+data.items())
+				self.local_dirs.update(data)
 				
 			except Exception as e:
 				print("!!",e,"File: " + f)
@@ -249,22 +256,26 @@ class NetFoldersManager:
 
 
 
-			try:					
+			try:	
 				info=self.get_acl_info(path)['return']
 				info=self.get_missing_acl_conf(info)['return']
 				
 				if ( os.lstat(path).st_uid != user ) or (os.lstat(path).st_gid != group):
 					os.lchown(path,user,group)
-				if int(str(oct(stat.S_IMODE(os.lstat(path).st_mode))).lstrip("0"))!=info[path]["perm"]:
+					
+				tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0")
+
+				if tmp!=info[path]["perm"]:
 					prevmask=os.umask(0)
-					os.chmod(path,int(str(info[path]["perm"]),8))
+					perm=info[path]["perm"]
+					os.chmod(path,perm)
 					os.umask(prevmask)
-				
 
 				for acl in info[path]["acl"]:
 					print("\t* Setting acls to " + path + " ...")
 					options,value=acl
 					self.set_acl(path,options,value,recursive)
+					
 			except Exception as e:
 				print (e)
 
@@ -277,7 +288,7 @@ class NetFoldersManager:
 		else:
 			recursive=""
 	
-		if type(path)==type(""):
+		if type(path)==bytes:
 			path=path.decode("utf-8")
 		
 		cmd_str="setfacl %s %s %s '%s'"%(recursive,options,value,path)
@@ -294,13 +305,14 @@ class NetFoldersManager:
 		self.remote_dirs={}
 		
 		try:
-			srv_ip=objects["VariablesManager"].get_variable("SRV_IP")
+			srv_ip=self.core.get_variable("SRV_IP")["return"]
 		except:
-			pass
+			srv_ip=None
 			
 		if srv_ip!=None:
 			sp=sambaparser.SambaParser()
 			for item in os.listdir(self.SMB_CONF_FOLDER):
+				
 				f=self.SMB_CONF_FOLDER+item
 				sp.read(f)
 				for key in sp.conf:
@@ -311,11 +323,11 @@ class NetFoldersManager:
 							self.remote_dirs[line]["dst"]=sp.conf[key]["mount_point"]
 							self.remote_dirs[line]["fstype"]="cifs"
 						except Exception as e:
-							#print e
-							pass
+							print(e)
+							
 						
 		#Old n4d: return self.remote_dirs
-		n4d.responses.build_successful_call_response(self.remote_dirs)
+		return n4d.responses.build_successful_call_response(self.remote_dirs)
 
 		
 	#def check_shared_folders
@@ -437,7 +449,6 @@ class NetFoldersManager:
 			
 			
 		except Exception as e:
-			
 			#return [False,str(e)]
 			return n4d.responses.build_failed_call_response(-10,str(e))
 		
