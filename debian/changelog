@@ -1,6 +1,7 @@
 n4d-netfolders (0.13) focal; urgency=medium
 
   * Fixed acls
+  * fixed n4d-modules in postinst
 
  -- Hector Garcia Huerta <hectorgh@gmail.com>  Thu, 18 Feb 2021 18:39:13 +0100
 
