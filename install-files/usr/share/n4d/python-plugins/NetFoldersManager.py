@@ -115,8 +115,10 @@ class NetFoldersManager:
 		out=out.decode("utf-8")
 		
 		info["acl"]=[]
-		tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0")
+		tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0o")
 		info["perm"]=tmp
+		
+		
 		info["path"]=path
 		
 		for item in out.split("\n"):
@@ -253,9 +255,9 @@ class NetFoldersManager:
 					os.umask(prevmask)
 				except Exception as e:
 					print("!!",e,path)
-
-
-
+		
+				
+			
 			try:	
 				info=self.get_acl_info(path)['return']
 				info=self.get_missing_acl_conf(info)['return']
@@ -263,12 +265,12 @@ class NetFoldersManager:
 				if ( os.lstat(path).st_uid != user ) or (os.lstat(path).st_gid != group):
 					os.lchown(path,user,group)
 					
-				tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0")
+				tmp=oct(stat.S_IMODE(os.lstat(path).st_mode)).lstrip("0o")
 
 				if tmp!=info[path]["perm"]:
 					prevmask=os.umask(0)
 					perm=info[path]["perm"]
-					os.chmod(path,perm)
+					os.chmod(path,int(str(perm),8))
 					os.umask(prevmask)
 
 				for acl in info[path]["acl"]:
@@ -278,6 +280,7 @@ class NetFoldersManager:
 					
 			except Exception as e:
 				print (e)
+			
 
 	#def check_local_folders
 	
