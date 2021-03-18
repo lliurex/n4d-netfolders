@@ -409,8 +409,8 @@ class NetFoldersManager:
 					
 					for acl in acls:
 						options,value=acl
-						if "-d" not in options:
-							file_acls.append(acl)
+						if "-d" in options:
+							file_acls.append((options,value))
 							
 					'''
 					print item
@@ -440,8 +440,10 @@ class NetFoldersManager:
 									self.set_acl(dir+"/"+f,options,value)
 								self.set_acl(dir+"/"+f,"-m","m:rw")
 							
-							for acl in acls:
+							for acl in file_acls:
 								options,value=acl
+								self.set_acl(dir,options,value)
+								options=options.replace("-d","")
 								self.set_acl(dir,options,value)
 								
 							os.umask(prevmask)
