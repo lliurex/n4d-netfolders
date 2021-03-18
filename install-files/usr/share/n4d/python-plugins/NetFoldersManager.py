@@ -361,10 +361,7 @@ class NetFoldersManager:
 			for item in self.local_dirs:
 				dirs_to_process[self.local_dirs[item]["path"]]=""
 				
-			
-
 			for item in self.local_dirs:
-				
 				
 					owner=self.local_dirs[item]["owner"]
 					group=self.local_dirs[item]["group"]
@@ -377,39 +374,39 @@ class NetFoldersManager:
 					
 					for acl in acls:
 						options,value=acl
-						if "-d" not in options:
-							file_acls.append(acl)
+						if "-d" in options:
+							file_acls.append((options,value))
 							
-					'''
-					print item
-					print "\t",owner,group,path,perm
-					print "\t",file_acls
-					'''
-					
 					for walk_item in os.walk(path):
 						dir,subdirs,files=walk_item
 						
 						if self.is_dir_workable(dir,dirs_to_process):
 							#print dir
 							#print "\t",files
+							#print dir
+							#print "\t",files
+								
 							dir=dir.encode("utf-8")	
 							cmd="setfacl -k -b '" + dir + "'"
 							os.system(cmd)
 							
 							prevmask=os.umask(0)
 							os.chmod(path,int(str(perm),8))
-													
+							
+
 							for f in files:
 								for acl in file_acls:
 									options,value=acl
+									options=options.replace("-d","")
 									if type(f)==type(u""):
 										f=f.encode("utf-8")
-									
 									self.set_acl(dir+"/"+f,options,value)
 								self.set_acl(dir+"/"+f,"-m","m:rw")
 							
-							for acl in acls:
+							for acl in file_acls:
 								options,value=acl
+								self.set_acl(dir,options,value)
+								options=options.replace("-d","")
 								self.set_acl(dir,options,value)
 								
 							os.umask(prevmask)
@@ -422,8 +419,8 @@ class NetFoldersManager:
 			
 			return [False,str(e)]
 		
-		
 	#def restore_acls
+	
 	
 	def restore_acls_via_thread(self):
 		
