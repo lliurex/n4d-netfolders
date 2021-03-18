@@ -9,7 +9,7 @@ Homepage: http://www.lliurex.net
 
 Package: n4d-netfolders
 Architecture: all
-Pre-depends: n4d
+Pre-depends: n4d, n4d-ldap(>=0.56)
 Depends: ${shlibs:Depends}, ${misc:Depends}, acl
 Description: N4D plugin to configure network folders
  This plugin configures samba network folders
