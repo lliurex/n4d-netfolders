@@ -55,8 +55,7 @@
         },
         "get_shared_folders": {
             "allowed_groups": [
-                "sudo",
-                "admins"
+                "anonymous"
             ]
         },
         "dprint": {
