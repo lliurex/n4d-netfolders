@@ -1,3 +1,9 @@
+n4d-netfolders (0.16) focal; urgency=medium
+
+  * Added standard return to is_acl_thread_alive function
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Tue, 08 Jun 2021 12:49:42 +0200
+
 n4d-netfolders (0.15) focal; urgency=medium
 
   * get_shared_folders function perms to anonymous
