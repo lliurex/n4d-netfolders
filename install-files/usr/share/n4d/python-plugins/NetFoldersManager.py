@@ -476,7 +476,7 @@ class NetFoldersManager:
 	
 	def is_acl_thread_alive(self):
 		
-		return self.acl_thread.is_alive()
+		return n4d.responses.build_successful_call_response(self.acl_thread.is_alive())
 
 	#def is_acl_thread_alive
 
