@@ -1,4 +1,4 @@
-n4d-netfolders (0.16) focal; urgency=medium
+n4d-netfolders (0.17) focal; urgency=medium
 
   * Added standard return to is_acl_thread_alive function
 
