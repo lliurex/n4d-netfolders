@@ -469,7 +469,7 @@ class NetFoldersManager:
 			self.acl_thread.start()
 			
 			
-		return True
+		return n4d.responses.build_successful_call_response()
 		
 		
 	#def restore_acls_via_thread
