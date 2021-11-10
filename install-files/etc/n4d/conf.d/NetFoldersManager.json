@@ -66,8 +66,7 @@
         },
         "get_acl_group_filtered": {
             "allowed_groups": [
-                "sudo",
-                "admins"
+                "anonymous"
             ]
         },
         "is_dir_workable": {
